@@ -8,16 +8,14 @@
 *********************************************************/
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
-
+#include <string.h>
 
 #define SUCCESS 0
 #define FAIL -1
 #define WORD_SIZE 32
 #define TABLE_SIZE 90000
-typedef struct node
-{
+typedef struct node {
     char vocabulary[WORD_SIZE];
     int integer;
     struct node *next;
@@ -28,46 +26,37 @@ void build_hash(char *);
 int query_hash(char *, int *);
 unsigned int hash(char *);
 
-int main()
-{
+int main() {
     for (int i = 0; i < TABLE_SIZE; i++)
         table[i] = NULL;
     build_hash("dict.txt");
     int value;
-    if (query_hash("yn", &value)==SUCCESS)
-    {
+    if (query_hash("yn", &value) == SUCCESS) {
         printf("%d", value);
     }
     return SUCCESS;
 }
 
 // TODO: build_hash : 將所指定的檔案建構出一個 hash table
-void build_hash(char *filename)
-{
+void build_hash(char *filename) {
     FILE *fptr;
     fptr = fopen(filename, "r");
-    if (!fptr)
-    {
+    if (!fptr) {
         printf("Fail to read file\n");
         return;
     }
     char vocabulary[WORD_SIZE];
     int integer;
-    while (fscanf(fptr, "%s %d", vocabulary, &integer) != EOF)
-    {
+    while (fscanf(fptr, "%s %d", vocabulary, &integer) != EOF) {
         node *temp = table[hash(vocabulary) % TABLE_SIZE];
         while (temp != NULL && strcmp(temp->vocabulary, vocabulary) != 0)
             temp = temp->next;
-        if (temp != NULL)
-        {
+        if (temp != NULL) {
             temp->integer = integer;
-        }
-        else
-        {
+        } else {
             unsigned int index = hash(vocabulary) % TABLE_SIZE;
             node *newnode = (node *)malloc(sizeof(node));
-            if (!newnode)
-            {
+            if (!newnode) {
                 printf("Fail to malloc1\n");
                 return;
             }
@@ -81,31 +70,25 @@ void build_hash(char *filename)
 }
 
 // TODO: query_hash : 查詢所指定英文字的資料，回傳其相對應數值
-int query_hash(char *vocabulary, int *value)
-{
+int query_hash(char *vocabulary, int *value) {
     node *temp = table[hash(vocabulary) % TABLE_SIZE];
     while (temp != NULL && strcmp(temp->vocabulary, vocabulary) != 0)
         temp = temp->next;
-    if (temp == NULL)
-    {
+    if (temp == NULL) {
         // printf("Word not found\n");
         // exit(0);
         return FAIL;
-    }
-    else
-    {
+    } else {
         *value = temp->integer;
         return SUCCESS;
     }
 }
 
-unsigned int hash(char *vocabulary)
-{
+unsigned int hash(char *vocabulary) {
     int length = strlen(vocabulary);
     long long value = 1;
     // TODO: define hash function
-    for (int i = 0; i < length; i++)
-    {
+    for (int i = 0; i < length; i++) {
         value *= vocabulary[i];
         value += length;
     }
